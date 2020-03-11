@@ -1821,12 +1821,14 @@ static int cred_has_capability(const struct cred *cred,
 
 	rc = avc_has_perm_noaudit(&selinux_state,
 				  sid, sid, sclass, av, 0, &avd);
+#ifdef CONFIG_AUDIT
 	if (!(opts & CAP_OPT_NOAUDIT)) {
 		int rc2 = avc_audit(&selinux_state,
 				    sid, sid, sclass, av, &avd, rc, &ad, 0);
 		if (rc2)
 			return rc2;
 	}
+#endif
 	return rc;
 }
 
@@ -3169,6 +3171,7 @@ static int selinux_inode_follow_link(struct dentry *dentry, struct inode *inode,
 				  rcu ? MAY_NOT_BLOCK : 0);
 }
 
+#ifdef CONFIG_AUDIT
 static noinline int audit_inode_permission(struct inode *inode,
 					   u32 perms, u32 audited, u32 denied,
 					   int result)
@@ -3187,6 +3190,7 @@ static noinline int audit_inode_permission(struct inode *inode,
 		return rc;
 	return 0;
 }
+#endif
 
 static int selinux_inode_permission(struct inode *inode, int mask)
 {
@@ -3197,8 +3201,7 @@ static int selinux_inode_permission(struct inode *inode, int mask)
 	struct inode_security_struct *isec;
 	u32 sid;
 	struct av_decision avd;
-	int rc, rc2;
-	u32 audited, denied;
+	int rc;
 
 	from_access = mask & MAY_ACCESS;
 	mask &= (MAY_READ|MAY_WRITE|MAY_EXEC|MAY_APPEND);
@@ -3223,6 +3226,10 @@ static int selinux_inode_permission(struct inode *inode, int mask)
 				  sid, isec->sid, isec->sclass, perms,
 				  (flags & MAY_NOT_BLOCK) ? AVC_NONBLOCKING : 0,
 				  &avd);
+#ifdef CONFIG_AUDIT
+	{
+		int rc2;
+		u32 audited, denied;
 	audited = avc_audit_required(perms, &avd, rc,
 				     from_access ? FILE__AUDIT_ACCESS : 0,
 				     &denied);
@@ -3236,6 +3243,8 @@ static int selinux_inode_permission(struct inode *inode, int mask)
 	rc2 = audit_inode_permission(inode, perms, audited, denied, rc);
 	if (rc2)
 		return rc2;
+	}
+#endif
 	return rc;
 }
 
