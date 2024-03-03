@@ -17,8 +17,9 @@
 #ifndef _UAPI__ASM_SIGCONTEXT_H
 #define _UAPI__ASM_SIGCONTEXT_H
 
-#ifdef CONFIG_64BIT
 #include <linux/types.h>
+#ifndef __ASSEMBLY__
+
 
 /*
  * Signal context structure - contains all info to do with the state
@@ -67,13 +68,19 @@ struct _aarch64_ctx {
 	__u32 size;
 };
 
+typedef struct {
+	__u64 a;
+	__u64 b;
+} ___uint128_t;
+
+
 #define FPSIMD_MAGIC	0x46508001
 
 struct fpsimd_context {
 	struct _aarch64_ctx head;
 	__u32 fpsr;
 	__u32 fpcr;
-	__uint128_t vregs[32];
+	___uint128_t vregs[32];
 };
 
 /* ESR_EL1 context */
@@ -127,7 +134,7 @@ struct sve_context {
 	__u16 __reserved[3];
 };
 
-#endif /* !CONFIG_64BIT */
+#endif /* !__ASSEMBLY__ */
 
 /*
  * The SVE architecture leaves space for future expansion of the
