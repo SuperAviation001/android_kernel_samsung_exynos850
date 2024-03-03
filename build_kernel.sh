@@ -50,8 +50,10 @@ KERNEL_SU()
   if [[ $root_confirm == [yY] || $root_confirm == [yY][eE][sS] ]]; then
     echo "Downloading KernelSU from github ..."
     curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash - > /dev/null 2>&1
+    make ARCH=arm64 -j64 kernelsu_defconfig O=$(pwd)/out
   else
     echo "KernelSU will NOT be implemented in this build..."
+    make ARCH=arm64 -j64 $DEFCONFIG O=$(pwd)/out
   fi
 
 }
@@ -94,7 +96,6 @@ BUILD_KERNEL()
 {
 	echo "*****************************************************"
 	echo "           Building kernel for SM-A217M UB           "
-	make ARCH=arm64 -j64 $DEFCONFIG O=$(pwd)/out
 	make ARCH=arm64 -j64 O=$(pwd)/out
 
   # Check if kernel Image was created
