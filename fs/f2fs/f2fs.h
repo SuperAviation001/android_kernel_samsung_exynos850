@@ -24,6 +24,7 @@
 #include <linux/quotaops.h>
 #include <crypto/hash.h>
 #include <linux/ctype.h>
+#include <linux/fsverity.h>
 #include "../mount.h"
 
 #define __FS_HAS_ENCRYPTION IS_ENABLED(CONFIG_F2FS_FS_ENCRYPTION)
@@ -2670,6 +2671,7 @@ enum {
 	FI_EXTRA_ATTR,		/* indicate file has extra attribute */
 	FI_PROJ_INHERIT,	/* indicate file inherits projectid */
 	FI_PIN_FILE,		/* indicate file should not be gced */
+	FI_COMPRESSED_FILE,	/* indicate file's data can be compressed */
 	FI_ATOMIC_REVOKE_REQUEST, /* request to drop atomic data */
 };
 
@@ -2944,6 +2946,13 @@ static inline bool f2fs_is_time_consistent(struct inode *inode)
 		return false;
 	return true;
 }
+
+static inline int f2fs_compressed_file(struct inode *inode)
+{
+    return S_ISREG(inode->i_mode) &&
+        is_inode_flag_set(inode, FI_COMPRESSED_FILE);
+}
+
 
 static inline bool f2fs_skip_inode_update(struct inode *inode, int dsync)
 {

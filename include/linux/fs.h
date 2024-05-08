@@ -41,6 +41,9 @@
 #include <asm/byteorder.h>
 #include <uapi/linux/fs.h>
 
+#define IS_VERITY(inode)     ((inode)->i_flags & S_VERITY)
+#define S_VERITY     65536   /* Verity file (using fs/verity/) */
+
 #ifdef CONFIG_MMC_SRPMB
 #include <linux/mmc/ioctl.h>
 #endif

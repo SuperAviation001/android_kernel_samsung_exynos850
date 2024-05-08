@@ -1,0 +1,6 @@
+*.dtbo
+*.dtbo.dtout   
+*.dtbo.reverse.dts
+*.dtb
+*.dtb.dtout
+*.dtb.reverse.dts
